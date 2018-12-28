@@ -1,4 +1,5 @@
 from hazm import word_tokenize, Lemmatizer
+from numpy.random import choice
 import string
 
 #TODO: load another corpus
@@ -8,7 +9,8 @@ def load_corpus(data_path):
     return corpus
 
 
-#TODO: lemma, space_to_space
+#TODO: lemma
+#TODO: space_to_space
 def tokenize(corpus,lemma=True, punctuation=True, space_to_space=True):
 
     if(not punctuation):
@@ -18,7 +20,6 @@ def tokenize(corpus,lemma=True, punctuation=True, space_to_space=True):
     tokenized = word_tokenize(corpus)
     return tokenized
 
-
 def generate_n_gram(tokenized, n):
     ngrams_list = []
     ngrams = []
@@ -26,7 +27,6 @@ def generate_n_gram(tokenized, n):
     for num in range(len(tokenized)):
         ngram=(tokenized[num:num + n])
         ngrams_list.append(ngram)
-
 
     for i in range(len(ngrams_list)):
         flag = False
@@ -38,13 +38,40 @@ def generate_n_gram(tokenized, n):
 
     return ngrams
 
-def generate_sentence():
-    return
+#TODO: end of sentense condition
+#TODO: compute prob
+def generate_sentence(n, start_word, ngrams, ngrams_minus_1):
+    sentence = [start_word]
+    m= 5
+
+    for i in range(m):
+        options = []
+        probs = []
+
+        for ngram_1 in ngrams_minus_1:
+            if ngram_1[0]== sentence[i:i+n-1]:
+                count_ngram_minus_1 = ngram_1[1]
+
+        for ngram in ngrams:
+            if ngram[0][0:n-1]== sentence[i:i+n-1]:
+                options.append(ngram[0][n-1])
+                probs.append(ngram[1]/count_ngram_minus_1)
+
+        
+        winner = choice(options, 1, probs)
+        sentence.append(winner[0])
+
+    return sentence
 
 def perplexity():
     return
 
+# n-gram
+n = 2
+
 corpus = load_corpus("corpus.txt")
 tokenized = tokenize(corpus,punctuation=False)
-ngrams = generate_n_gram(tokenized, 4)
-ngrams_minus_1 = generate_n_gram(tokenized, 3)
+ngrams = generate_n_gram(tokenized, n)
+ngrams_minus_1 = generate_n_gram(tokenized, n-1)
+sentence = generate_sentence(n=n,start_word='و' ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
+print (sentence)
