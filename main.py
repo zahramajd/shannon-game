@@ -1,6 +1,7 @@
 from hazm import word_tokenize, Lemmatizer
 from numpy.random import choice
 import string
+import math
 
 #TODO: load another corpus
 def load_corpus(data_path):
@@ -39,10 +40,11 @@ def generate_n_gram(tokenized, n):
     return ngrams
 
 #TODO: end of sentense condition
-#TODO: compute prob
 def generate_sentence(n, start_word, ngrams, ngrams_minus_1):
     sentence = [start_word]
     m= 5
+
+    multiplied_probs =1
 
     for i in range(m):
         options = []
@@ -60,11 +62,11 @@ def generate_sentence(n, start_word, ngrams, ngrams_minus_1):
         
         winner = choice(options, 1, probs)
         sentence.append(winner[0])
+        multiplied_probs = multiplied_probs * probs[options.index(winner)]
 
-    return sentence
+    perplexity= math.pow((1/multiplied_probs),(1/m))
 
-def perplexity():
-    return
+    return sentence,perplexity
 
 # n-gram
 n = 2
@@ -73,5 +75,6 @@ corpus = load_corpus("corpus.txt")
 tokenized = tokenize(corpus,punctuation=False)
 ngrams = generate_n_gram(tokenized, n)
 ngrams_minus_1 = generate_n_gram(tokenized, n-1)
-sentence = generate_sentence(n=n,start_word='و' ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
+sentence, perplexity = generate_sentence(n=n,start_word='و' ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
 print (sentence)
+print(perplexity)
