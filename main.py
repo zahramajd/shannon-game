@@ -43,12 +43,11 @@ def generate_n_gram(tokenized, n):
 
     return ngrams
 
-def generate_sentence(n, start_word, ngrams, ngrams_minus_1):
-    sentence = [start_word]
-    m= 5
+def generate_sentence(n, start_words, ngrams, ngrams_minus_1):
+    sentence = start_words
     multiplied_probs =1
-
     i=0
+
     while not sentence[-1]=='</S>':
         options = []
         probs = []
@@ -67,7 +66,7 @@ def generate_sentence(n, start_word, ngrams, ngrams_minus_1):
         multiplied_probs = multiplied_probs * probs[options.index(winner)]
         i=i+1
 
-    perplexity= math.pow((1/multiplied_probs),(1/m))
+    perplexity= math.pow((1/multiplied_probs),(1/len(sentence)))
 
     return sentence,perplexity
 
@@ -78,7 +77,7 @@ corpus = load_corpus("test.txt")
 tokenized = tokenize(corpus,lemma=False, punctuation=True)
 ngrams = generate_n_gram(tokenized, n)
 ngrams_minus_1 = generate_n_gram(tokenized, n-1)
-sentence, perplexity = generate_sentence(n=n,start_word='<S>' ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
+sentence, perplexity = generate_sentence(n=n,start_words=['<S>'] ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
 
 print (sentence)
 print(perplexity)
