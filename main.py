@@ -9,16 +9,21 @@ def load_corpus(data_path):
             corpus = corpus.read()
     return corpus
 
-
-#TODO: lemma
 #TODO: space_to_space
 def tokenize(corpus,lemma=True, punctuation=True, space_to_space=True):
 
     if(not punctuation):
         table = str.maketrans({key: None for key in string.punctuation})
-        corpus = corpus.translate(table)   
+        corpus = corpus.translate(table)
 
     tokenized = word_tokenize(corpus)
+
+    if(lemma):
+        lemmatizer=Lemmatizer()
+        for i in range(len(tokenized)):
+            tokenized[i] = lemmatizer.lemmatize(tokenized[i]).split('#')[0]
+
+    print(tokenized)
     return tokenized
 
 def generate_n_gram(tokenized, n):
@@ -40,10 +45,10 @@ def generate_n_gram(tokenized, n):
     return ngrams
 
 #TODO: end of sentense condition
+#TODO: 3gram and more
 def generate_sentence(n, start_word, ngrams, ngrams_minus_1):
     sentence = [start_word]
     m= 5
-
     multiplied_probs =1
 
     for i in range(m):
@@ -73,8 +78,8 @@ n = 2
 
 corpus = load_corpus("corpus.txt")
 tokenized = tokenize(corpus,punctuation=False)
-ngrams = generate_n_gram(tokenized, n)
-ngrams_minus_1 = generate_n_gram(tokenized, n-1)
-sentence, perplexity = generate_sentence(n=n,start_word='و' ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
-print (sentence)
-print(perplexity)
+# ngrams = generate_n_gram(tokenized, n)
+# ngrams_minus_1 = generate_n_gram(tokenized, n-1)
+# sentence, perplexity = generate_sentence(n=n,start_word='و' ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
+# print (sentence)
+# print(perplexity)
