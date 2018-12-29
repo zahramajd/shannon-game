@@ -3,13 +3,13 @@ from numpy.random import choice
 import string
 import math
 
-#TODO: load another corpus
 def load_corpus(data_path):
     with open(data_path, "r", encoding="utf-8") as corpus:
             corpus = corpus.read()
     return corpus
 
 #TODO: space_to_space
+#TODO: don't remove < >
 def tokenize(corpus,lemma=True, punctuation=True, space_to_space=True):
 
     if(not punctuation):
@@ -23,7 +23,6 @@ def tokenize(corpus,lemma=True, punctuation=True, space_to_space=True):
         for i in range(len(tokenized)):
             tokenized[i] = lemmatizer.lemmatize(tokenized[i]).split('#')[0]
 
-    print(tokenized)
     return tokenized
 
 def generate_n_gram(tokenized, n):
@@ -44,14 +43,13 @@ def generate_n_gram(tokenized, n):
 
     return ngrams
 
-#TODO: end of sentense condition
-#TODO: 3gram and more
 def generate_sentence(n, start_word, ngrams, ngrams_minus_1):
     sentence = [start_word]
     m= 5
     multiplied_probs =1
 
-    for i in range(m):
+    i=0
+    while not sentence[-1]=='</S>':
         options = []
         probs = []
 
@@ -64,10 +62,10 @@ def generate_sentence(n, start_word, ngrams, ngrams_minus_1):
                 options.append(ngram[0][n-1])
                 probs.append(ngram[1]/count_ngram_minus_1)
 
-        
         winner = choice(options, 1, probs)
         sentence.append(winner[0])
         multiplied_probs = multiplied_probs * probs[options.index(winner)]
+        i=i+1
 
     perplexity= math.pow((1/multiplied_probs),(1/m))
 
@@ -76,10 +74,11 @@ def generate_sentence(n, start_word, ngrams, ngrams_minus_1):
 # n-gram
 n = 2
 
-corpus = load_corpus("corpus.txt")
-tokenized = tokenize(corpus,punctuation=False)
-# ngrams = generate_n_gram(tokenized, n)
-# ngrams_minus_1 = generate_n_gram(tokenized, n-1)
-# sentence, perplexity = generate_sentence(n=n,start_word='و' ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
-# print (sentence)
-# print(perplexity)
+corpus = load_corpus("test.txt")
+tokenized = tokenize(corpus,lemma=False, punctuation=True)
+ngrams = generate_n_gram(tokenized, n)
+ngrams_minus_1 = generate_n_gram(tokenized, n-1)
+sentence, perplexity = generate_sentence(n=n,start_word='<S>' ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
+
+print (sentence)
+print(perplexity)
