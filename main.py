@@ -8,10 +8,9 @@ def load_corpus(data_path):
             corpus = corpus.read()
     return corpus
 
-#TODO: don't remove < >
 #TODO: save probs
 #TODO: test data
-#TODO: unigram
+#TODO: perplexity in log
 def tokenize(corpus,lemma=True, punctuation=True, space_to_space=True):
 
     if(not punctuation):
@@ -80,21 +79,39 @@ def generate_sentence(n, start_words, ngrams, ngrams_minus_1):
 
     return sentence,perplexity
 
-# n-gram
-n = 2
+def generate_unigram_sentences(tokenized):
+    unigrams = []
+    sentence = []
+    vocab = set(tokenized)
+    
+    for word in vocab:
+        unigrams.append((word,tokenized.count(word)/len(vocab)))
+
+    i=0
+    multiplied_probs =1
+
+    while (len(sentence)==0 or not sentence[-1]=='</S>'):
+
+        options=[i[0] for i in unigrams]
+        probs=[i[1] for i in unigrams]
+
+        winner = choice(options, 1, probs)
+        sentence.append(winner[0])
+
+        multiplied_probs = multiplied_probs * probs[options.index(winner)]
+        i=i+1
+
+    # perplexity= math.pow((1/multiplied_probs),(1/len(sentence)))
+
+    return unigrams, sentence
+
+
 
 corpus = load_corpus("test.txt")
 tokenized = tokenize(corpus,lemma=False, punctuation=False)
+generate_unigram_sentences(tokenized)
 
-
-ngrams = generate_n_gram(tokenized, n)
-ngrams_minus_1 = generate_n_gram(tokenized, n-1)
-sentence, perplexity = generate_sentence(n=n,start_words=['<S>'] ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
-print (sentence)
-print(perplexity)
-
-sentences = []
-
+#sentences = []
 # for n in range(1,6):
 #     for j in range(10):
 #         print(n, j)
