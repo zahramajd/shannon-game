@@ -8,13 +8,23 @@ def load_corpus(data_path):
             corpus = corpus.read()
     return corpus
 
-#TODO: space_to_space
 #TODO: don't remove < >
+#TODO: save probs
+#TODO: test data
+#TODO: unigram
 def tokenize(corpus,lemma=True, punctuation=True, space_to_space=True):
 
     if(not punctuation):
-        table = str.maketrans({key: None for key in string.punctuation})
-        corpus = corpus.translate(table)
+        # table = str.maketrans({key: None for key in string.punctuation})
+        # corpus = corpus.translate(table)
+        corpus = corpus.replace(',', ' ')
+        corpus=corpus.replace("\u220c","")
+        corpus = corpus.replace('(', ' ')
+        corpus = corpus.replace(')', ' ')
+        corpus = corpus.replace('.', ' ')
+        corpus=corpus.replace("،"," ")
+        corpus=corpus.replace("«"," ")
+        corpus=corpus.replace("»"," ")
 
     tokenized = word_tokenize(corpus)
 
@@ -71,35 +81,35 @@ def generate_sentence(n, start_words, ngrams, ngrams_minus_1):
     return sentence,perplexity
 
 # n-gram
-n = 3
+n = 2
 
 corpus = load_corpus("test.txt")
-tokenized = tokenize(corpus,lemma=False, punctuation=True)
+tokenized = tokenize(corpus,lemma=False, punctuation=False)
 
 
-# ngrams = generate_n_gram(tokenized, n)
-# ngrams_minus_1 = generate_n_gram(tokenized, n-1)
-# sentence, perplexity = generate_sentence(n=n,start_words=['<S>','و'] ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
-# print (sentence)
-# print(perplexity)
+ngrams = generate_n_gram(tokenized, n)
+ngrams_minus_1 = generate_n_gram(tokenized, n-1)
+sentence, perplexity = generate_sentence(n=n,start_words=['<S>'] ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
+print (sentence)
+print(perplexity)
 
 sentences = []
 
-for n in range(1,6):
-    for j in range(10):
-        print(n, j)
-        ngrams = generate_n_gram(tokenized, n)
-        ngrams_minus_1 = generate_n_gram(tokenized, n-1)
+# for n in range(1,6):
+#     for j in range(10):
+#         print(n, j)
+#         ngrams = generate_n_gram(tokenized, n)
+#         ngrams_minus_1 = generate_n_gram(tokenized, n-1)
 
-        if(n==1):
-            sentence, perplexity = generate_sentence(n=n,start_words=[] ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
+#         if(n==1):
+#             sentence, perplexity = generate_sentence(n=n,start_words=[] ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
 
-        if(n==2):
-            sentence, perplexity = generate_sentence(n=n,start_words=['<S>'] ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
-            sentences.append(sentence)
+#         if(n==2):
+#             sentence, perplexity = generate_sentence(n=n,start_words=['<S>'] ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
+#             sentences.append(sentence)
 
-        if(not n==1 and not n==2):
-            sentence, perplexity = generate_sentence(n=n,start_words=sentences[(n-3)*10+j][0:n-1] ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
-            sentences.append(sentence)
+#         if(not n==1 and not n==2):
+#             sentence, perplexity = generate_sentence(n=n,start_words=sentences[(n-3)*10+j][0:n-1] ,ngrams=ngrams, ngrams_minus_1=ngrams_minus_1)
+#             sentences.append(sentence)
 
-        print('ngram: ', n, 'sentence: ', sentence, 'perplexity: ', perplexity)
+#         print('ngram: ', n, 'sentence: ', sentence, 'perplexity: ', perplexity)
