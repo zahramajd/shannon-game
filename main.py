@@ -4,7 +4,6 @@ import string
 import math
 
 #TODO: save in file
-#TODO: test
 
 def load_corpus(data_path):
     with open(data_path, "r", encoding="utf-8") as corpus:
@@ -143,39 +142,42 @@ def compute_test_perplexity(n, data_path, tokenized):
     ngrams = generate_n_gram(tokenized, n)
     ngrams_minus_1 = generate_n_gram(tokenized, n-1)
 
-    i=0
-    perpexs = []
-    while(i<len(test)):
+    sum_log_probs = 0
+    for i in range(len(test_tokenized)):
 
-        while(not test[i]== '</S>'):
-            # sentence = []
-            # sentence.append(test[i])
-            sum_p = 0
-        
-            for ngram in ngrams:
-                if ngram[-1]== test[i]:
-                    count_ngram = ngram[1]
+        found = False
+        for ngram in ngrams:
+            if ngram[0] == test_tokenized[i-n:i]:
+                count_ngram = ngram[1]
+                found = True
 
-            for ngram_1 in ngrams_minus_1:
-                if ngram_1[0:1] == test[i-2:i-1]:
-                    prob = count_ngram / ngram_1[1]
-                    sum_p = sum_p + math.log(prob,2)
-            
-            perpexs.append(2**(-1.0 * sum_p)/len)
-            i = i+1
+        for ngram_1 in ngrams_minus_1:
+            if ngram_1[0] == test_tokenized[i-n:i-1]:
+                prob = count_ngram / ngram_1[1]
+                sum_log_probs = sum_log_probs + math.log(prob,2)
 
-    i = i + 1
-    return
+
+        if( not found):
+            prob = 1
+
+
+        sum_log_probs = sum_log_probs + math.log(prob,2)
+
+    perplexity_by_log= 2** (-1.0 * sum_log_probs / len(test_tokenized))
+
+    print (perplexity_by_log)
+
+    return 
 
 
 ## Generate
-# corpus = load_corpus("test.txt")
+# corpus = load_corpus("train.txt")
 # tokenized = tokenize(corpus,lemma=False, punctuation=False)
 # # generate_unigram_sentences(tokenized)
 # generate_all_sentences()
 
 
 ## Test
-# corpus = load_corpus("test.txt")
-# tokenized = tokenize(corpus,lemma=False, punctuation=False)
-# compute_test_perplexity(n=2, data_path="test.txt", tokenized=tokenized)
+corpus = load_corpus("train.txt")
+tokenized = tokenize(corpus,lemma=False, punctuation=False)
+compute_test_perplexity(n=2, data_path="test.txt", tokenized=tokenized)
