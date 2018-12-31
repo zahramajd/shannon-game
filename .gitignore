@@ -12,3 +12,9 @@ test.txt
 .idea/workspace.xml
 .idea/misc.xml
 train.txt
+test1.txt
+train1.txt
+1gram_sentenses.txt
+ngram_sentenses.txt
+test2.txt
+train2.txt
